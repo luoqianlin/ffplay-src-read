@@ -2568,7 +2568,6 @@ static int stream_component_open(VideoState *is, int stream_index)
 
     is->eof = 0;
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
-    ic->discard=0;
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
 #if CONFIG_AVFILTER
