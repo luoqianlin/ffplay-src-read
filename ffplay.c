@@ -117,9 +117,9 @@ typedef struct MyAVPacketList {
 
 typedef struct PacketQueue {
     MyAVPacketList *first_pkt, *last_pkt;
-    int nb_packets;
-    int size;
-    int64_t duration;
+    int nb_packets; //queue AVPacket size
+    int size; //queue MyAVPacketList list total bytes
+    int64_t duration; // all pkt.duration total
     int abort_request;
     int serial;
     SDL_mutex *mutex;
@@ -215,7 +215,7 @@ typedef struct VideoState {
     int64_t seek_rel;
     int read_pause_return;
     AVFormatContext *ic;
-    int realtime;
+    int realtime; //flag media source is realtime (rtsp,rtp,udp)
 
     Clock audclk;
     Clock vidclk;
@@ -231,7 +231,7 @@ typedef struct VideoState {
 
     int audio_stream;
 
-    int av_sync_type;
+    int av_sync_type;//sync type video/audio/external clock
 
     double audio_clock;
     int audio_clock_serial;
@@ -505,7 +505,7 @@ static void packet_queue_start(PacketQueue *q)
     packet_queue_put_private(q, &flush_pkt);
     SDL_UnlockMutex(q->mutex);
 }
-
+// pop queue first VAPacket,and out VAPacket serial
 /* return < 0 if aborted, 0 if no packet and > 0 if packet.  */
 static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block, int *serial)
 {
@@ -2854,7 +2854,7 @@ static int read_thread(void *arg)
 
     if (infinite_buffer < 0 && is->realtime)
         infinite_buffer = 1;
-
+/*  decode packet loop */
     for (;;) {
         if (is->abort_request)
             break;
